@@ -6,8 +6,8 @@ let portName = "/dev/tty.usbmodem11201"; // fill in your serial port name here
 let width = window.innerWidth;
 let height = window.innerHeight;
 
-let notes = ["E4","D4","F4","G4","A4","B4","C4","D4","E5","D5","F5","G5"]; // notes de musique
-let notePositions = [100, 150, 120, 180, 130, 170, 180, 200, 220, 240, 260, 280]; // Y de chaque note sur l’interface
+let notes = ["G5","F5","E5","D5","C5","B4","A4","G4","F4","E4","D4","C4"]; // notes de musique
+let notePositions = [165, 180, 193, 205, 220, 235, 248, 265, 277, 290, 305, 320]; // Y de chaque note sur l’interface
 let touchIndex;
 let touchStates = new Array(notePositions.length).fill(false);
 let circles = []; // tableau pour stocker toutes les touches pressées
@@ -80,7 +80,7 @@ function serialEvent() {
                     circles.push({
                         x: nextX,                      // utilise la position courante
                         y: notePositions[touchIndex],
-                        color: [50,205,200],              // couleur
+                        color: [0,0,0],              // couleur
                         index: touchIndex
                     });
                     console.log("Added circle for touch index:", touchIndex, "at position Y:", notePositions[touchIndex]);
@@ -143,11 +143,19 @@ function draw() {
   stroke(0);
   strokeWeight(2);
   let lineSpacing = blockHeight / 6; // diviser l'espace en 6 parties pour 5 lignes
-  
+
   for (let i = 1; i < 6; i++) {
     let y = blockStartY + lineSpacing * i;
     line(blockX, y, blockX + blockWidth, y);
   }
+
+  // 6e ligne grise
+  stroke(200);
+  strokeWeight(1.5);
+  let y6 = blockStartY + lineSpacing * 6;
+  line(blockX, y6, blockX + blockWidth, y6);
+
+  
   
   // Boutons sous le bloc
   let buttonSize = 60;
