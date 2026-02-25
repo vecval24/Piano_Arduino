@@ -1,72 +1,55 @@
-#include <Wire.h>
-#include "Adafruit_MPR121.h"
+// Bibliothèques
+#include <Wire.h>               // protocole I2C (communication avec capteur, SDA & SCL)
+#include "Adafruit_MPR121.h"    // bibliothèque pour le capteur
 
 #ifndef _BV
-#define _BV(bit) (1 << (bit))
+#define _BV(bit) (1 << (bit))   // masque binaire pour chaque touche
 #endif
 
-Adafruit_MPR121 cap = Adafruit_MPR121();
+Adafruit_MPR121 cap = Adafruit_MPR121(); // objet pour contrôler le capteur
 
-static const uint8_t PIEZO_PIN = 7;
-
+// Stocker l'état des touches précédentes et actuelles
 uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
 
-static const uint16_t baseFreqs[12] = {
-  262, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494
-};
-
-static const uint8_t octaveShift = 0;
-
-static uint16_t applyOctave(uint16_t f, uint8_t shift) {
-  uint32_t out = f;
-  while (shift--) out *= 2U;
-  if (out > 65535U) out = 65535U;
-  return (uint16_t)out;
-}
-
 void setup() {
-  Serial.begin(9600);
-
-  while (!Serial) {
-    delay(10);
-  }
+  Serial.begin(9600); //serial monitor 9600 bauds (v comm d'un signal)
+  while (!Serial) { delay(10); }
 
   Serial.println("Adafruit MPR121 Capacitive Touch sensor test");
 
   if (!cap.begin(0x5A)) {
     Serial.println("MPR121 not found, check wiring?");
-    while (1) {}
+    while (1) {} // boucle infinie si capteur non détecté
   }
 
   Serial.println("MPR121 found!");
   Serial.println("Running auto configuration.");
   cap.setAutoconfig(true);
   Serial.println("Initialization complete.");
-
-  pinMode(PIEZO_PIN, OUTPUT);
-  noTone(PIEZO_PIN);
 }
 
 void loop() {
-  currtouched = cap.touched();
+  currtouched = cap.touched(); //état actuel des touches 0 = relâché, 1 = touché
 
   for (uint8_t i = 0; i < 12; i++) {
-    if ((currtouched & _BV(i)) && !(lasttouched & _BV(i))) {
-      uint16_t f = applyOctave(baseFreqs[i], octaveShift);
+    // Nouvelle touche pressée
+    if ((currtouched & _BV(i)) && !(lasttouched & _BV(i))) { //touchée mtn mais pas avant
+     //Serial.print("Touche "); //Interfère avec le indextouch envoyé à la console
       Serial.print(i);
-      Serial.print(" touched -> ");
-      Serial.println(f);
-      tone(PIEZO_PIN, f);
+      Serial.println(",1");
+      //Serial.println(" touchée");
     }
 
-    if (!(currtouched & _BV(i)) && (lasttouched & _BV(i))) {
+    // Touche relâchée
+    if (!(currtouched & _BV(i)) && (lasttouched & _BV(i))) { //pas touchée mtn mais touchée avant
+      //Serial.print("Touche ");
       Serial.print(i);
-      Serial.println(" released");
-      noTone(PIEZO_PIN);
+      Serial.println(",0");
+      //Serial.println(" relâchée");
     }
   }
 
-  lasttouched = currtouched;
+  lasttouched = currtouched; //màj état
   delay(10);
 }

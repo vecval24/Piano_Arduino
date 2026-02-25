@@ -39,7 +39,14 @@ function portOpen() {
   console.log("the serial port is opened.");
 }
 
-function serialEvent() {}
+function serialEvent() {
+let data = serial.readLine(); 
+if (data) { let parts = data.split(","); 
+  let touchIndex = int(parts[0]); 
+  let state = int(parts[1]);
+  console.log("Touche", touchIndex, "Etat:", state);
+}
+}
 
 function serialError(err) {
   console.log("Something went wrong with the serial port. " + err);

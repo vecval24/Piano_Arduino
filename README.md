@@ -62,7 +62,7 @@ Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout
 
 Encre conductrice
 
-Résistances / câblage
+Câblage
 
 Ordinateur (pour génération du son et partition)`
 
