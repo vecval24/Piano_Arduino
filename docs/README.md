@@ -30,7 +30,7 @@ Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit
 | 4   | Câbles mâles   | 14       | Câbles mâles (breadboard, capteur)     |[Lien](https://store.arduino.cc/collections/breadboards/products/breadboard-400-contacts)
 (#) 
 | 5   | Câbles USB 2.0 |          |
-        type A/B       | 1    | Câble Arduino et ordinateur                |[Lien](https://store-usa.arduino.cc/collections/cables-wires/products/usb-2-0-cable-type-ab)
+|     |  type A/B      | 1    | Câble Arduino et ordinateur                |[Lien](https://store-usa.arduino.cc/collections/cables-wires/products/usb-2-0-cable-type-ab)
 (#) 
 
 ## Programme
