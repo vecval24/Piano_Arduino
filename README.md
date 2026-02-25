@@ -19,21 +19,21 @@ Les touches du piano sont fabriquées en utilisant de l’encre conductrice, per
 
 
 ## Fonctionnement
-1. Détection des touches
+1 - Détection des touches
 
-Le module MPR121 permet de détecter jusqu’à 12 entrées tactiles capacitives.
-Dans ce projet, 8 entrées sont utilisées pour représenter les notes d’une octave (Do, Ré, Mi, Fa, Sol, La, Si, Do).
+    Le module MPR121 permet de détecter jusqu’à 12 entrées tactiles capacitives.
+    Dans ce projet, 8 entrées sont utilisées pour représenter les notes d’une octave (Do, Ré, Mi, Fa, Sol, La, Si, Do).
 
-Chaque surface en encre conductrice agit comme une touche de piano. Lorsqu’un doigt entre en contact avec la surface via l'encre conductrice :
+    Chaque surface en encre conductrice agit comme une touche de piano. Lorsqu’un doigt entre en contact avec la surface via l'encre conductrice :
 
-Le changement de capacité est détecté
+    Le changement de capacité est détecté
 
-L’information est envoyée à l’Arduino 
+    L’information est envoyée à l’Arduino 
 
-L’Arduino transmet la note correspondante à l’ordinateur
+    L’Arduino transmet la note correspondante à l’ordinateur
 
 
-2. Génération du son
+2 - Génération du son
 
 L’Arduino communique avec l’ordinateur.
 Un programme côté ordinateur :
@@ -45,13 +45,13 @@ Un programme côté ordinateur :
 - Joue le son correspondant via les haut-parleurs
 
 
-3. Enregistrement et génération de partition
+3 - Enregistrement et génération de partition
 
-Chaque note jouée est stockée dans une structure de données.
+    Chaque note jouée est stockée dans une structure de données.
 
-À partir de ces informations, une partition numérique est générée automatiquement.
+    À partir de ces informations, une partition numérique est générée automatiquement.
 
-Cette partition peut ensuite être visualisée et réécoutée jusqu'à ce que l'on recommence une nouvelle mélodie.
+    Cette partition peut ensuite être visualisée et réécoutée jusqu'à ce que l'on recommence une nouvelle mélodie.
 
 
 ## Matériel utilisé
