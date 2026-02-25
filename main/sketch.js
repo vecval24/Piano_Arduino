@@ -6,6 +6,14 @@ let portName = "/dev/tty.usbmodem11201"; // fill in your serial port name here
 let width = window.innerWidth;
 let height = window.innerHeight;
 
+let notes = ["E4","D4","F4","G4","A4","B4","C4","D4","E5","D5","F5","G5"]; // notes de musique
+let notePositions = [100, 150, 120, 180, 130, 170, 180, 200, 220, 240, 260, 280]; // Y de chaque note sur l’interface
+let touchIndex;
+let touchStates = new Array(notePositions.length).fill(false);
+let circles = []; // tableau pour stocker toutes les touches pressées
+let nextX = 50; // position horizontale du premier cercle
+let xStep = 50; // distance entre chaque cercle
+
 function setup() {
   console.log("Setup sketch");
   createCanvas(width, height);
@@ -40,13 +48,49 @@ function portOpen() {
 }
 
 function serialEvent() {
-let data = serial.readLine(); //lire la ligne de données envoyée par l'Arduino
-if (data) { let parts = data.split(","); // séparer les données en fonction de la virgule 
-  let touchIndex = int(parts[0]); // index de la touche (0-11)
-  let state = int(parts[1]);  // état de la touche (1 ou 0)
-  console.log("Touche", touchIndex, "Etat:", state);
+// let data = serial.readLine(); //lire la ligne de données envoyée par l'Arduino
+// if (data) { let parts = data.split(","); // séparer les données en fonction de la virgule 
+//   let touchIndex = int(parts[0]); // index de la touche (0-11)
+//   let state = int(parts[1]);  // état de la touche (1 ou 0)
+//   console.log("Touche", touchIndex, "Etat:", state);
+// }
+// let data = serial.readLine();
+// console.log("Touch index received:", touchIndex);
+//     if (data && data.length > 0) {
+//         let parts = data.trim().split(",");
+//         if (parts.length === 2) {
+//             touchIndex = parseInt(parts[0]);
+//             let state = parseInt(parts[1]);
+//             if(state === 1){ // touche pressée
+//                 drawCircle(touchIndex);
+//                 // jouer le son ici plus tard
+//             }
+//         }
+//     }
+
+    let data = serial.readLine();
+    if (data && data.length > 0) {
+        let parts = data.trim().split(",");
+        if (parts.length === 2) {
+            let touchIndex = parseInt(parts[0]);
+            let state = parseInt(parts[1]);
+
+            if(touchIndex >= 0 && touchIndex < notePositions.length){
+                if(state === 1){ // touche pressée
+                    circles.push({
+                        x: nextX,                      // utilise la position courante
+                        y: notePositions[touchIndex],
+                        color: [50,205,200],              // couleur
+                        index: touchIndex
+                    });
+                    console.log("Added circle for touch index:", touchIndex, "at position Y:", notePositions[touchIndex]);
+                    nextX += xStep; // préparer la prochaine note à droite
+                }
+            }
+        }
+    }
 }
-}
+
 
 function serialError(err) {
   console.log("Something went wrong with the serial port. " + err);
@@ -54,6 +98,19 @@ function serialError(err) {
 
 function portClose() {
   console.log("The serial port is closed.");
+}
+
+function drawCircle(index){
+    if(index < 0 || index >= notePositions.length){
+        console.warn("Index hors limites :", index);
+        return; // ne fait rien
+    }
+    let y = notePositions[index];
+    let x = 200;
+    fill(0,255,0);
+    noStroke();
+    ellipse(x, y, 30);
+    console.log("Drew circle at index:", index, "Position Y:", y);
 }
 
 function draw() {
@@ -75,7 +132,7 @@ function draw() {
   let blockWidth = width * 0.8;
   let blockX = (width - blockWidth) / 2;
   let blockStartY = 50 + titlePadding;
-  let blockHeight = height * 0.3;
+  let blockHeight = height * 0.4;
   
   // Dessiner le bloc (optionnel, juste les bordures)
   noStroke();
@@ -128,4 +185,12 @@ function draw() {
     squareSize,
     squareSize
   );
+
+    for(let i = 0; i < circles.length; i++){
+        fill(circles[i].color);
+        noStroke();
+        ellipse(circles[i].x, circles[i].y, 25);
+    }
 }
+
+
