@@ -40,10 +40,10 @@ function portOpen() {
 }
 
 function serialEvent() {
-let data = serial.readLine(); 
-if (data) { let parts = data.split(","); 
-  let touchIndex = int(parts[0]); 
-  let state = int(parts[1]);
+let data = serial.readLine(); //lire la ligne de données envoyée par l'Arduino
+if (data) { let parts = data.split(","); // séparer les données en fonction de la virgule 
+  let touchIndex = int(parts[0]); // index de la touche (0-11)
+  let state = int(parts[1]);  // état de la touche (1 ou 0)
   console.log("Touche", touchIndex, "Etat:", state);
 }
 }
@@ -56,4 +56,76 @@ function portClose() {
   console.log("The serial port is closed.");
 }
 
-function draw() {}
+function draw() {
+  background(255);
+
+  // Padding au-dessus du titre
+  let topPadding = 30;
+  
+  // Titre centré en haut
+  textAlign(CENTER);
+  textSize(48);
+  fill(0);
+  text("Piano", width / 2, topPadding + 50);
+
+  // Padding sous le titre
+  let titlePadding = 100;
+  
+  // Bloc de 80% de la largeur
+  let blockWidth = width * 0.8;
+  let blockX = (width - blockWidth) / 2;
+  let blockStartY = 50 + titlePadding;
+  let blockHeight = height * 0.3;
+  
+  // Dessiner le bloc (optionnel, juste les bordures)
+  noStroke();
+  noFill();
+  rect(blockX, 0, blockWidth, blockHeight);
+  
+  // Créer 5 lignes noires horizontales
+  stroke(0);
+  strokeWeight(2);
+  let lineSpacing = blockHeight / 6; // diviser l'espace en 6 parties pour 5 lignes
+  
+  for (let i = 1; i < 6; i++) {
+    let y = blockStartY + lineSpacing * i;
+    line(blockX, y, blockX + blockWidth, y);
+  }
+  
+  // Boutons sous le bloc
+  let buttonSize = 60;
+  let buttonSpacing = 40;
+  let buttonsStartY = blockStartY + blockHeight + 40;
+  let totalButtonsWidth = (buttonSize * 2) + buttonSpacing;
+  let buttonsStartX = (width - totalButtonsWidth) / 2;
+  
+  // Bouton Play (rond avec triangle)
+  fill(0);
+  stroke(0);
+  strokeWeight(2);
+  circle(buttonsStartX + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
+  
+  // Triangle pour Play (pointe à droite)
+  fill(255);
+  triangle(
+    buttonsStartX + buttonSize / 2 - 9, buttonsStartY + buttonSize / 2 - 12,
+    buttonsStartX + buttonSize / 2 - 9, buttonsStartY + buttonSize / 2 + 12,
+    buttonsStartX + buttonSize / 2 + 12, buttonsStartY + buttonSize / 2
+  );
+  
+  // Bouton Terminer (rond avec carré)
+  fill(0);
+  stroke(0);
+  strokeWeight(2);
+  circle(buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
+  
+  // Carré pour Terminer
+  fill(255);
+  let squareSize = 18;
+  rect(
+    buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2 - squareSize / 2,
+    buttonsStartY + buttonSize / 2 - squareSize / 2,
+    squareSize,
+    squareSize
+  );
+}
