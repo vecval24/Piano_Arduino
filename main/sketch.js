@@ -11,8 +11,21 @@ let notePositions = [165, 180, 193, 205, 220, 235, 248, 265, 277, 290, 305, 320]
 let touchIndex;
 let touchStates = new Array(notePositions.length).fill(false);
 let circles = []; // tableau pour stocker toutes les touches pressées
-let nextX = 50; // position horizontale du premier cercle
-let xStep = 50; // distance entre chaque cercle
+
+//sons
+let oscillators = [];
+let frequencies = [783.99, 698.46, 659.25, 587.33, 523.25, 493.88, 440.00, 392.00, 349.23, 329.63, 293.66, 261.63];
+let playButtonX;
+let playButtonY;
+let buttonSize = 60;
+let audioStarted = false;
+let isPlaying = false;
+
+// Variables globales pour le bloc de musique
+let blockX;
+let blockWidth;
+let nextX;
+let xStep = 50;
 
 function setup() {
   console.log("Setup sketch");
@@ -29,6 +42,15 @@ function setup() {
 
   serial.list(); // list the serial ports
   serial.open(portName); // open a serial port
+
+  for(let i = 0; i < frequencies.length; i++){
+    let osc = new p5.Oscillator();
+    osc.setType('triangle'); // son plus "instrumental"
+    osc.freq(frequencies[i]);
+    osc.amp(0);
+    osc.start();
+    oscillators.push(osc);
+  }
 }
 
 // get the list of ports:
@@ -48,47 +70,62 @@ function portOpen() {
 }
 
 function serialEvent() {
-// let data = serial.readLine(); //lire la ligne de données envoyée par l'Arduino
-// if (data) { let parts = data.split(","); // séparer les données en fonction de la virgule 
-//   let touchIndex = int(parts[0]); // index de la touche (0-11)
-//   let state = int(parts[1]);  // état de la touche (1 ou 0)
-//   console.log("Touche", touchIndex, "Etat:", state);
-// }
-// let data = serial.readLine();
-// console.log("Touch index received:", touchIndex);
-//     if (data && data.length > 0) {
-//         let parts = data.trim().split(",");
-//         if (parts.length === 2) {
-//             touchIndex = parseInt(parts[0]);
-//             let state = parseInt(parts[1]);
-//             if(state === 1){ // touche pressée
-//                 drawCircle(touchIndex);
-//                 // jouer le son ici plus tard
-//             }
-//         }
-//     }
-
-    let data = serial.readLine();
+  let data = serial.readLine();
     if (data && data.length > 0) {
         let parts = data.trim().split(",");
         if (parts.length === 2) {
             let touchIndex = parseInt(parts[0]);
             let state = parseInt(parts[1]);
 
-            if(touchIndex >= 0 && touchIndex < notePositions.length){
-                if(state === 1){ // touche pressée
-                    circles.push({
-                        x: nextX,                      // utilise la position courante
-                        y: notePositions[touchIndex],
-                        color: [0,0,0],              // couleur
-                        index: touchIndex
-                    });
-                    console.log("Added circle for touch index:", touchIndex, "at position Y:", notePositions[touchIndex]);
-                    nextX += xStep; // préparer la prochaine note à droite
+            if(touchIndex >= 0 && touchIndex < oscillators.length){
+
+                // 🎵 GESTION DU SON
+                if(state === 1){
+                    oscillators[touchIndex].amp(0.5, 0.05); // fade in
+                } else {
+                    oscillators[touchIndex].amp(0, 0.1); // fade out
+                }
+
+                // 🎨 GESTION DES RONDS
+                if(state === 1){
+                    if(nextX + 12.5 <= blockX + blockWidth){
+                        circles.push({
+                            x: nextX,
+                            y: notePositions[touchIndex],
+                            color: [0,0,0],
+                            index: touchIndex
+                        });
+
+                        nextX += xStep;
+                    }
                 }
             }
         }
     }
+    // let data = serial.readLine();
+    // if (data && data.length > 0) {
+    //     let parts = data.trim().split(",");
+    //     if (parts.length === 2) {
+    //         let touchIndex = parseInt(parts[0]);
+    //         let state = parseInt(parts[1]);
+
+    //         if(touchIndex >= 0 && touchIndex < notePositions.length){
+    //             if(state === 1){ // touche pressée
+    //                 // Vérifier que nextX ne dépasse pas la limite du bloc
+    //                 if(nextX + 12.5 <= blockX + blockWidth){ // 12.5 est le rayon du cercle (25/2)
+    //                     circles.push({
+    //                         x: nextX,
+    //                         y: notePositions[touchIndex],
+    //                         color: [0,0,0],
+    //                         index: touchIndex
+    //                     });
+    //                     console.log("Added circle for touch index:", touchIndex, "at position Y:", notePositions[touchIndex]);
+    //                     nextX += xStep;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 
@@ -113,26 +150,49 @@ function drawCircle(index){
     console.log("Drew circle at index:", index, "Position Y:", y);
 }
 
+function mousePressed() {
+let d = dist(mouseX, mouseY, playButtonX, playButtonY);
+
+  if (d < buttonSize / 2) {
+
+    // Démarrer AudioContext si nécessaire
+    userStartAudio();
+
+    // Inverser l’état
+    isPlaying = !isPlaying;
+
+    console.log("isPlaying:", isPlaying);
+
+    // Si on met en pause → couper tous les sons
+    if (!isPlaying) {
+      for (let i = 0; i < oscillators.length; i++) {
+        oscillators[i].amp(0, 0.1);
+      }
+    }
+  }
+}
+
 function draw() {
   background(255);
 
-  // Padding au-dessus du titre
   let topPadding = 30;
   
-  // Titre centré en haut
   textAlign(CENTER);
   textSize(48);
   fill(0);
   text("Piano", width / 2, topPadding + 50);
 
-  // Padding sous le titre
   let titlePadding = 100;
   
-  // Bloc de 80% de la largeur
-  let blockWidth = width * 0.8;
-  let blockX = (width - blockWidth) / 2;
+  blockWidth = width * 0.8;
+  blockX = (width - blockWidth) / 2;
   let blockStartY = 50 + titlePadding;
   let blockHeight = height * 0.4;
+  
+  // Initialiser nextX au début du bloc au premier appel
+  if(nextX === undefined) {
+    nextX = blockX;
+  }
   
   // Dessiner le bloc (optionnel, juste les bordures)
   noStroke();
@@ -165,18 +225,49 @@ function draw() {
   let buttonsStartX = (width - totalButtonsWidth) / 2;
   
   // Bouton Play (rond avec triangle)
-  fill(0);
-  stroke(0);
-  strokeWeight(2);
-  circle(buttonsStartX + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
+  // fill(0);
+  // stroke(0);
+  // strokeWeight(2);
+  // circle(buttonsStartX + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
   
   // Triangle pour Play (pointe à droite)
-  fill(255);
+  // fill(255);
+  // triangle(
+  //   buttonsStartX + buttonSize / 2 - 9, buttonsStartY + buttonSize / 2 - 12,
+  //   buttonsStartX + buttonSize / 2 - 9, buttonsStartY + buttonSize / 2 + 12,
+  //   buttonsStartX + buttonSize / 2 + 12, buttonsStartY + buttonSize / 2
+  // );
+
+  playButtonX = buttonsStartX + buttonSize / 2;
+playButtonY = buttonsStartY + buttonSize / 2;
+
+fill(0);
+stroke(0);
+strokeWeight(2);
+circle(playButtonX, playButtonY, buttonSize);
+
+// Couleur bouton
+fill(0);
+stroke(0);
+strokeWeight(2);
+circle(playButtonX, playButtonY, buttonSize);
+
+// Symbole dynamique
+fill(255);
+noStroke();
+
+if (!isPlaying) {
+  // ▶ TRIANGLE (Play)
   triangle(
-    buttonsStartX + buttonSize / 2 - 9, buttonsStartY + buttonSize / 2 - 12,
-    buttonsStartX + buttonSize / 2 - 9, buttonsStartY + buttonSize / 2 + 12,
-    buttonsStartX + buttonSize / 2 + 12, buttonsStartY + buttonSize / 2
+    playButtonX - 9, playButtonY - 12,
+    playButtonX - 9, playButtonY + 12,
+    playButtonX + 12, playButtonY
   );
+} else {
+  // ❚❚ PAUSE (2 barres)
+  rect(playButtonX - 8, playButtonY - 12, 6, 24);
+  rect(playButtonX + 2, playButtonY - 12, 6, 24);
+}
   
   // Bouton Terminer (rond avec carré)
   fill(0);
