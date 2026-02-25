@@ -70,6 +70,14 @@ function portOpen() {
 }
 
 function serialEvent() {
+  // Si on n'est pas en mode lecture, s'assurer que tout est coupé et ignorer l'input
+  if (!isPlaying) {
+    for (let i = 0; i < oscillators.length; i++) {
+      oscillators[i].amp(0); // arrêt immédiat
+    }
+    return;
+  }
+
   let data = serial.readLine();
     if (data && data.length > 0) {
         let parts = data.trim().split(",");
@@ -79,14 +87,14 @@ function serialEvent() {
 
             if(touchIndex >= 0 && touchIndex < oscillators.length){
 
-                // 🎵 GESTION DU SON
+                // 🎵 GESTION DU SON (uniquement si isPlaying est true grâce au guard ci-dessus)
                 if(state === 1){
                     oscillators[touchIndex].amp(0.5, 0.05); // fade in
                 } else {
                     oscillators[touchIndex].amp(0, 0.1); // fade out
                 }
 
-                // 🎨 GESTION DES RONDS
+                // 🎨 GESTION DES RONDS - n'ajouter un cercle que si isPlaying est true
                 if(state === 1){
                     if(nextX + 12.5 <= blockX + blockWidth){
                         circles.push({
@@ -97,6 +105,14 @@ function serialEvent() {
                         });
 
                         nextX += xStep;
+
+                        // si on vient de dépasser la fin du bloc => arrêter tout de suite
+                        if(nextX + 12.5 > blockX + blockWidth){
+                            isPlaying = false;
+                            for (let i = 0; i < oscillators.length; i++) {
+                                oscillators[i].amp(0); // arrêt immédiat
+                            }
+                        }
                     }
                 }
             }
@@ -151,7 +167,8 @@ function drawCircle(index){
 }
 
 function mousePressed() {
-let d = dist(mouseX, mouseY, playButtonX, playButtonY);
+
+  let d = dist(mouseX, mouseY, playButtonX, playButtonY);
 
   if (d < buttonSize / 2) {
 
@@ -161,19 +178,27 @@ let d = dist(mouseX, mouseY, playButtonX, playButtonY);
     // Inverser l’état
     isPlaying = !isPlaying;
 
-    console.log("isPlaying:", isPlaying);
-
-    // Si on met en pause → couper tous les sons
+    // Si on met en pause → couper tous les sons immédiatement
     if (!isPlaying) {
       for (let i = 0; i < oscillators.length; i++) {
-        oscillators[i].amp(0, 0.1);
+        oscillators[i].amp(0); // arrêt immédiat pour éviter tout son résiduel
       }
     }
+
+    console.log("isPlaying:", isPlaying);
   }
 }
 
 function draw() {
   background(255);
+
+  // sécurité : si nextX est déjà au-delà de la limite, couper immédiatement les sons
+  if (isPlaying && nextX !== undefined && nextX + 12.5 > blockX + blockWidth) {
+    isPlaying = false;
+    for (let i = 0; i < oscillators.length; i++) {
+      oscillators[i].amp(0);
+    }
+  }
 
   let topPadding = 30;
   
