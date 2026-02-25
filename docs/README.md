@@ -12,6 +12,7 @@ Le circuit électronique du projet repose sur une communication entre la carte m
 
 ### Schéma
 
+Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout, avec les connexions d’alimentation et I2C, et un câble connecté à une touche de piano capacitive (une des 8 notes de l’octave).
 ![Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout, avec les connexions d’alimentation et I2C, et un câble connecté à une touche de piano capacitive (une des 8 notes de l’octave).](/docs/assets/Schéma%20Fritzing.png)
 
 ### BOM
