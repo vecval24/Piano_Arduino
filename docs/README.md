@@ -23,9 +23,9 @@ Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit
 (#)                               |
 | 2   | Breadboard     | 1        | Plaque de prototypage                  | [Lien](https://store.arduino.cc/collections/breadboards/products/breadboard-400-contacts) 
 (#)                               |
-| 3   | Adafruit MPR121| 
-12-Key Capacitive Touch| 
-Sensor Breakout        | 1        | Capteur tactile capacitif              |[Lien](https://learn.adafruit.com/adafruit-mpr121-12-key-capacitive-touch-sensor-breakout-tutorial)                                  
+| 3   | Adafruit MPR121|          |
+|     | 12-Key Capacitive|        |
+|     |Touch Sensor Breakout      | 1    | Capteur tactile capacitif      |[Lien](https://learn.adafruit.com/adafruit-mpr121-12-key-capacitive-touch-sensor-breakout-tutorial)                                  
 (#)                               |
 | 4   | Câbles mâles   | 14       | Câbles mâles (breadboard, capteur)     |[Lien](https://store.arduino.cc/collections/breadboards/products/breadboard-400-contacts)
 (#) 
