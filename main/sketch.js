@@ -7,10 +7,11 @@ let width = window.innerWidth;
 let height = window.innerHeight;
 
 let notes = ["G5","F5","E5","D5","C5","B4","A4","G4","F4","E4","D4","C4"]; // notes de musique
-let notePositions = [165, 180, 193, 205, 220, 235, 248, 265, 277, 290, 305, 320]; // Y de chaque note sur l’interface
+let notePositions = [169, 192, 217, 238, 261, 283, 307, 329, 352, 374, 397, 420]; // Y de chaque note sur l’interface
 let touchIndex;
 let touchStates = new Array(notePositions.length).fill(false);
 let circles = []; // tableau pour stocker toutes les touches pressées
+let circleDiameter = 40; // diamètre des cercles affichés (agrandis)
 
 //sons
 let oscillators = [];
@@ -96,7 +97,8 @@ function serialEvent() {
 
                 // 🎨 GESTION DES RONDS - n'ajouter un cercle que si isPlaying est true
                 if(state === 1){
-                    if(nextX + 12.5 <= blockX + blockWidth){
+                    let radius = circleDiameter / 2;
+                    if(nextX + radius <= blockX + blockWidth){
                         circles.push({
                             x: nextX,
                             y: notePositions[touchIndex],
@@ -107,7 +109,7 @@ function serialEvent() {
                         nextX += xStep;
 
                         // si on vient de dépasser la fin du bloc => arrêter tout de suite
-                        if(nextX + 12.5 > blockX + blockWidth){
+                        if(nextX + radius > blockX + blockWidth){
                             isPlaying = false;
                             for (let i = 0; i < oscillators.length; i++) {
                                 oscillators[i].amp(0); // arrêt immédiat
@@ -128,7 +130,8 @@ function serialEvent() {
     //         if(touchIndex >= 0 && touchIndex < notePositions.length){
     //             if(state === 1){ // touche pressée
     //                 // Vérifier que nextX ne dépasse pas la limite du bloc
-    //                 if(nextX + 12.5 <= blockX + blockWidth){ // 12.5 est le rayon du cercle (25/2)
+    //                 let radius = circleDiameter / 2;
+    //                 if(nextX + radius <= blockX + blockWidth){ // radius calculé depuis circleDiameter
     //                     circles.push({
     //                         x: nextX,
     //                         y: notePositions[touchIndex],
@@ -162,7 +165,7 @@ function drawCircle(index){
     let x = 200;
     fill(0,255,0);
     noStroke();
-    ellipse(x, y, 30);
+    ellipse(x, y, circleDiameter);
     console.log("Drew circle at index:", index, "Position Y:", y);
 }
 
@@ -193,7 +196,7 @@ function draw() {
   background(255);
 
   // sécurité : si nextX est déjà au-delà de la limite, couper immédiatement les sons
-  if (isPlaying && nextX !== undefined && nextX + 12.5 > blockX + blockWidth) {
+  if (isPlaying && nextX !== undefined && nextX + circleDiameter/2 > blockX + blockWidth) {
     isPlaying = false;
     for (let i = 0; i < oscillators.length; i++) {
       oscillators[i].amp(0);
@@ -313,7 +316,7 @@ if (!isPlaying) {
     for(let i = 0; i < circles.length; i++){
         fill(circles[i].color);
         noStroke();
-        ellipse(circles[i].x, circles[i].y, 25);
+        ellipse(circles[i].x, circles[i].y, circleDiameter);
     }
 }
 
