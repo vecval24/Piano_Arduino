@@ -6,7 +6,8 @@ let portName = "/dev/tty.usbmodem11201"; // fill in your serial port name here
 let width = window.innerWidth;
 let height = window.innerHeight;
 
-let notes = ["G5","F5","E5","D5","C5","B4","A4","G4","F4","E4","D4","C4"]; // notes de musique
+// notes de musique ; la première (index 0, G5) sera traitée comme une silence (rest)
+let notes = ["G5","F5","E5","D5","C5","B4","A4","G4","F4","E4","D4","C4"]; 
 let notePositions = [169, 192, 217, 238, 261, 283, 307, 329, 352, 374, 397, 420]; // Y de chaque note sur l’interface
 let touchIndex;
 let touchStates = new Array(notePositions.length).fill(false);
@@ -18,6 +19,7 @@ let showListenButton = false;
 let listenButtonX;
 let listenButtonY;
 let listenButtonSize = 60;
+let playingSequence = false; // interdit multiple déclenchements de la séquence
 // bouton supplémentaire "start" affiché à droite de listen
 let startButtonX;
 let startButtonY;
@@ -106,9 +108,13 @@ function serialEvent() {
 
                 // 🎵 GESTION DU SON (uniquement si isPlaying est true grâce au guard ci-dessus)
                 if(state === 1){
-                    oscillators[touchIndex].amp(0.5, 0.05); // fade in
+                    if(touchIndex !== 0) { // première note est un silence
+                        oscillators[touchIndex].amp(0.5, 0.05); // fade in
+                    }
                 } else {
-                    oscillators[touchIndex].amp(0, 0.1); // fade out
+                    if(touchIndex !== 0) {
+                        oscillators[touchIndex].amp(0, 0.1); // fade out
+                    }
                 }
 
                 // 🎨 GESTION DES RONDS - n'ajouter un cercle que si isPlaying est true
@@ -119,7 +125,8 @@ function serialEvent() {
                             x: nextX,
                             y: notePositions[touchIndex],
                             color: [0,0,0],
-                            index: touchIndex
+                            index: touchIndex,
+                            isRest: touchIndex === 0
                         });
 
                         nextX += xStep;
@@ -190,11 +197,11 @@ function mousePressed() {
 
   // si on affiche le bouton unique "listen", gérer indépendemment
   if (showListenButton) {
-    // bouton listen
+    // bouton listen (désactivé pendant lecture)
     let rectW = listenButtonSize;
     let rectH = buttonSize;
-    let listenCenterX = listenButtonX + rectW/2;
-    if (mouseX >= listenCenterX - rectW/2 && mouseX <= listenCenterX + rectW/2 &&
+    // listenButtonX représente déjà le centre du bouton
+    if (!playingSequence && mouseX >= listenButtonX - rectW/2 && mouseX <= listenButtonX + rectW/2 &&
         mouseY >= listenButtonY - rectH/2 && mouseY <= listenButtonY + rectH/2) {
       playSequence();
       console.log("Listen button pressed, playing sequence");
@@ -330,8 +337,21 @@ function draw() {
     textSize(16);
     let w = textWidth("listen");
     listenButtonSize = max(buttonSize, w + 20 + 20); // largeur minimum
-    listenButtonX = width / 2 - listenButtonSize/2 - 10; // laisse 10px entre les deux
+
+    // préparer start dimensions
+    let wStart = textWidth(startLabel);
+    startButtonW = max(buttonSize, wStart + 20 + 20);
+    startButtonH = buttonSize;
+
+    // calculer largeur totale du groupe et positionner au centre
+    let totalWidth = listenButtonSize + 20 + startButtonW;
+    let groupX = (width - totalWidth) / 2;
+
+    listenButtonX = groupX + listenButtonSize/2;
     listenButtonY = buttonsStartY + buttonSize / 2;
+    startButtonX = groupX + listenButtonSize + 20 + startButtonW/2;
+    startButtonY = listenButtonY;
+
     let rectW = listenButtonSize;
     let rectH = buttonSize;
     let radius = 40;
@@ -341,19 +361,20 @@ function draw() {
     stroke(0);
     strokeWeight(2);
     rectMode(CENTER);
-    rect(listenButtonX + rectW/2, listenButtonY, rectW, rectH, radius);
+    rect(listenButtonX, listenButtonY, rectW, rectH, radius);
     fill(255);
     noStroke();
     textAlign(CENTER, CENTER);
-    text("listen", listenButtonX + rectW/2, listenButtonY);
+    text("listen", listenButtonX, listenButtonY);
 
-    // préparer et dessiner start à droite
-    let wStart = textWidth(startLabel);
-    startButtonW = max(buttonSize, wStart + 20 + 20);
-    startButtonH = buttonSize;
-    // positionner juste à droite de listen avec 20px de marge
-    startButtonX = listenButtonX + rectW + 20 + startButtonW/2;
-    startButtonY = listenButtonY;
+    // dessiner start à droite
+    fill(0);
+    stroke(0);
+    strokeWeight(2);
+    rect(startButtonX, startButtonY, startButtonW, startButtonH, radius);
+    fill(255);
+    noStroke();
+    text(startLabel, startButtonX, startButtonY);
 
     fill(0);
     stroke(0);
@@ -405,15 +426,32 @@ function draw() {
   }
 
     for(let i = 0; i < circles.length; i++){
-        fill(circles[i].color);
-        noStroke();
-        ellipse(circles[i].x, circles[i].y, circleDiameter);
+        if(circles[i].isRest) {
+            // la blanche : si on est en train de jouer on affiche un contour gris,
+            // sinon on ne dessine rien
+            if(isPlaying) {
+                noFill();
+                stroke(150); // gris
+                strokeWeight(2);
+                ellipse(circles[i].x, circles[i].y, circleDiameter);
+            } else {
+                // aucun trait/aucun remplissage lorsque la lecture est stoppée
+                noFill();
+                noStroke();
+            }
+        } else {
+            fill(circles[i].color);
+            noStroke();
+            ellipse(circles[i].x, circles[i].y, circleDiameter);
+        }
     }
 }
 
 // lit chaque note enregistrée dans l'ordre horizontal
 function playSequence() {
     if (circles.length === 0) return;
+    if (playingSequence) return;
+    playingSequence = true;
 
     // trier par coordonnée X pour garantir l'ordre de lecture
     let sorted = circles.slice().sort((a, b) => a.x - b.x);
@@ -425,12 +463,19 @@ function playSequence() {
     sorted.forEach(c => {
         let idx = c.index;
         setTimeout(() => {
-            oscillators[idx].amp(0.5, 0.05);
-            setTimeout(() => {
-                oscillators[idx].amp(0, 0.1);
-            }, noteDuration);
+            if(idx !== 0) { // ne joue pas le silence
+                oscillators[idx].amp(0.5, 0.05);
+                setTimeout(() => {
+                    oscillators[idx].amp(0, 0.1);
+                }, noteDuration);
+            }
         }, delay);
         delay += noteDuration + gap;
     });
+
+    // libérer le bouton after last note
+    setTimeout(() => {
+        playingSequence = false;
+    }, delay);
 }
 
