@@ -25,6 +25,10 @@ let startButtonW;
 let startButtonH;
 let startLabel = "start";
 
+// bouton terminer et positions pour détection
+let terminatorX;
+let terminatorY;
+
 //sons
 let oscillators = [];
 let frequencies = [783.99, 698.46, 659.25, 587.33, 523.25, 493.88, 440.00, 392.00, 349.23, 329.63, 293.66, 261.63];
@@ -206,6 +210,7 @@ function mousePressed() {
     return; // ne pas traiter les autres boutons
   }
 
+  // premier vérifier le bouton Play/Pause
   let d = dist(mouseX, mouseY, playButtonX, playButtonY);
 
   if (d < buttonSize / 2) {
@@ -225,6 +230,19 @@ function mousePressed() {
     }
 
     console.log("isPlaying:", isPlaying);
+    return; // éviter de déclencher terminator dans le même clic
+  }
+
+  // ensuite vérifier Terminer
+  let d2 = dist(mouseX, mouseY, terminatorX, terminatorY);
+  if (d2 < buttonSize / 2) {
+    // simuler fin de ligne
+    isPlaying = false;
+    showListenButton = true;
+    for (let i = 0; i < oscillators.length; i++) {
+      oscillators[i].amp(0);
+    }
+    console.log("Terminer button pressed, switching to listen/start mode");
   }
 }
 
@@ -368,17 +386,19 @@ function draw() {
     }
 
     // Bouton Terminer (rond avec carré)
+    terminatorX = buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2;
+    terminatorY = buttonsStartY + buttonSize / 2;
     fill(0);
     stroke(0);
     strokeWeight(2);
-    circle(buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
+    circle(terminatorX, terminatorY, buttonSize);
     
     // Carré pour Terminer
     fill(255);
     let squareSize = 18;
     rect(
-      buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2 - squareSize / 2,
-      buttonsStartY + buttonSize / 2 - squareSize / 2,
+      terminatorX - squareSize / 2,
+      terminatorY - squareSize / 2,
       squareSize,
       squareSize
     );
