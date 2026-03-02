@@ -13,6 +13,18 @@ let touchStates = new Array(notePositions.length).fill(false);
 let circles = []; // tableau pour stocker toutes les touches pressées
 let circleDiameter = 40; // diamètre des cercles affichés (agrandis)
 
+// gestion du bouton unique après fin de lecture
+let showListenButton = false;
+let listenButtonX;
+let listenButtonY;
+let listenButtonSize = 60;
+// bouton supplémentaire "start" affiché à droite de listen
+let startButtonX;
+let startButtonY;
+let startButtonW;
+let startButtonH;
+let startLabel = "start";
+
 //sons
 let oscillators = [];
 let frequencies = [783.99, 698.46, 659.25, 587.33, 523.25, 493.88, 440.00, 392.00, 349.23, 329.63, 293.66, 261.63];
@@ -111,6 +123,7 @@ function serialEvent() {
                         // si on vient de dépasser la fin du bloc => arrêter tout de suite
                         if(nextX + radius > blockX + blockWidth){
                             isPlaying = false;
+                            showListenButton = true;
                             for (let i = 0; i < oscillators.length; i++) {
                                 oscillators[i].amp(0); // arrêt immédiat
                             }
@@ -171,6 +184,28 @@ function drawCircle(index){
 
 function mousePressed() {
 
+  // si on affiche le bouton unique "listen", gérer indépendemment
+  if (showListenButton) {
+    // bouton listen
+    let rectW = listenButtonSize;
+    let rectH = buttonSize;
+    let listenCenterX = listenButtonX + rectW/2;
+    if (mouseX >= listenCenterX - rectW/2 && mouseX <= listenCenterX + rectW/2 &&
+        mouseY >= listenButtonY - rectH/2 && mouseY <= listenButtonY + rectH/2) {
+      playSequence();
+      console.log("Listen button pressed, playing sequence");
+      return;
+    }
+    // bouton start
+    if (mouseX >= startButtonX - startButtonW/2 && mouseX <= startButtonX + startButtonW/2 &&
+        mouseY >= startButtonY - startButtonH/2 && mouseY <= startButtonY + startButtonH/2) {
+      console.log("Start button pressed");
+      window.location.reload();
+      return;
+    }
+    return; // ne pas traiter les autres boutons
+  }
+
   let d = dist(mouseX, mouseY, playButtonX, playButtonY);
 
   if (d < buttonSize / 2) {
@@ -180,6 +215,7 @@ function mousePressed() {
 
     // Inverser l’état
     isPlaying = !isPlaying;
+    showListenButton = false; // on quitte le mode "fin" si on relance manuellement
 
     // Si on met en pause → couper tous les sons immédiatement
     if (!isPlaying) {
@@ -198,6 +234,7 @@ function draw() {
   // sécurité : si nextX est déjà au-delà de la limite, couper immédiatement les sons
   if (isPlaying && nextX !== undefined && nextX + circleDiameter/2 > blockX + blockWidth) {
     isPlaying = false;
+    showListenButton = true;
     for (let i = 0; i < oscillators.length; i++) {
       oscillators[i].amp(0);
     }
@@ -266,52 +303,86 @@ function draw() {
   //   buttonsStartX + buttonSize / 2 + 12, buttonsStartY + buttonSize / 2
   // );
 
+  // position du bouton principal (play/pause) - calculée même si on n'affiche pas forcément ce bouton
   playButtonX = buttonsStartX + buttonSize / 2;
-playButtonY = buttonsStartY + buttonSize / 2;
+  playButtonY = buttonsStartY + buttonSize / 2;
 
-fill(0);
-stroke(0);
-strokeWeight(2);
-circle(playButtonX, playButtonY, buttonSize);
+  if (showListenButton) {
+    // bouton Listen + star côte à côte
+    textSize(16);
+    let w = textWidth("listen");
+    listenButtonSize = max(buttonSize, w + 20 + 20); // largeur minimum
+    listenButtonX = width / 2 - listenButtonSize/2 - 10; // laisse 10px entre les deux
+    listenButtonY = buttonsStartY + buttonSize / 2;
+    let rectW = listenButtonSize;
+    let rectH = buttonSize;
+    let radius = 40;
 
-// Couleur bouton
-fill(0);
-stroke(0);
-strokeWeight(2);
-circle(playButtonX, playButtonY, buttonSize);
+    // dessiner listen
+    fill(0);
+    stroke(0);
+    strokeWeight(2);
+    rectMode(CENTER);
+    rect(listenButtonX + rectW/2, listenButtonY, rectW, rectH, radius);
+    fill(255);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    text("listen", listenButtonX + rectW/2, listenButtonY);
 
-// Symbole dynamique
-fill(255);
-noStroke();
+    // préparer et dessiner start à droite
+    let wStart = textWidth(startLabel);
+    startButtonW = max(buttonSize, wStart + 20 + 20);
+    startButtonH = buttonSize;
+    // positionner juste à droite de listen avec 20px de marge
+    startButtonX = listenButtonX + rectW + 20 + startButtonW/2;
+    startButtonY = listenButtonY;
 
-if (!isPlaying) {
-  // ▶ TRIANGLE (Play)
-  triangle(
-    playButtonX - 9, playButtonY - 12,
-    playButtonX - 9, playButtonY + 12,
-    playButtonX + 12, playButtonY
-  );
-} else {
-  // ❚❚ PAUSE (2 barres)
-  rect(playButtonX - 8, playButtonY - 12, 6, 24);
-  rect(playButtonX + 2, playButtonY - 12, 6, 24);
-}
-  
-  // Bouton Terminer (rond avec carré)
-  fill(0);
-  stroke(0);
-  strokeWeight(2);
-  circle(buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
-  
-  // Carré pour Terminer
-  fill(255);
-  let squareSize = 18;
-  rect(
-    buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2 - squareSize / 2,
-    buttonsStartY + buttonSize / 2 - squareSize / 2,
-    squareSize,
-    squareSize
-  );
+    fill(0);
+    stroke(0);
+    strokeWeight(2);
+    rect(startButtonX, startButtonY, startButtonW, startButtonH, radius);
+    fill(255);
+    noStroke();
+    text(startLabel, startButtonX, startButtonY);
+  } else {
+    // Bouton Play/Pause comme avant
+    fill(0);
+    stroke(0);
+    strokeWeight(2);
+    circle(playButtonX, playButtonY, buttonSize);
+
+    // Symbole dynamique
+    fill(255);
+    noStroke();
+    if (!isPlaying) {
+      // ▶ TRIANGLE (Play)
+      triangle(
+        playButtonX - 9, playButtonY - 12,
+        playButtonX - 9, playButtonY + 12,
+        playButtonX + 12, playButtonY
+      );
+    } else {
+      // ❚❚ PAUSE (2 barres)
+      rect(playButtonX - 8, playButtonY - 12, 6, 24);
+      rect(playButtonX + 2, playButtonY - 12, 6, 24);
+    }
+
+    // Bouton Terminer (rond avec carré)
+    fill(0);
+    stroke(0);
+    strokeWeight(2);
+    circle(buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2, buttonsStartY + buttonSize / 2, buttonSize);
+    
+    // Carré pour Terminer
+    fill(255);
+    let squareSize = 18;
+    rect(
+      buttonsStartX + buttonSize + buttonSpacing + buttonSize / 2 - squareSize / 2,
+      buttonsStartY + buttonSize / 2 - squareSize / 2,
+      squareSize,
+      squareSize
+    );
+  }
 
     for(let i = 0; i < circles.length; i++){
         fill(circles[i].color);
@@ -320,4 +391,26 @@ if (!isPlaying) {
     }
 }
 
+// lit chaque note enregistrée dans l'ordre horizontal
+function playSequence() {
+    if (circles.length === 0) return;
+
+    // trier par coordonnée X pour garantir l'ordre de lecture
+    let sorted = circles.slice().sort((a, b) => a.x - b.x);
+    let delay = 0;
+    // valeurs raccourcies pour jouer plus rapidement et plus brièvement
+    const noteDuration = 300; // ms (auparavant 400)
+    const gap = 50; // intervalle entre notes (auparavant 100)
+
+    sorted.forEach(c => {
+        let idx = c.index;
+        setTimeout(() => {
+            oscillators[idx].amp(0.5, 0.05);
+            setTimeout(() => {
+                oscillators[idx].amp(0, 0.1);
+            }, noteDuration);
+        }, delay);
+        delay += noteDuration + gap;
+    });
+}
 
