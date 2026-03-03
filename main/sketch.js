@@ -1,33 +1,34 @@
 console.log("sketch");
 
-let serial; // variable to hold an instance of the serialport library
+let serial; // objet JavaScript communication sketch p5.js avec un port USB série
 let portName = "/dev/tty.usbmodem11201"; // fill in your serial port name here
 
 let width = window.innerWidth;
 let height = window.innerHeight;
 
-// notes de musique ; la première (index 0, G5) sera traitée comme une silence (rest)
+// notes de musique 
 let notes = ["G5","F5","E5","D5","C5","B4","A4","G4","F4","E4","D4","C4"]; 
 let notePositions = [169, 192, 217, 238, 261, 283, 307, 329, 352, 374, 397, 420]; // Y de chaque note sur l’interface
 let touchIndex;
 let touchStates = new Array(notePositions.length).fill(false);
 let circles = []; // tableau pour stocker toutes les touches pressées
-let circleDiameter = 40; // diamètre des cercles affichés (agrandis)
+let circleDiameter = 40; // diamètre des cercles affichés 
 
-// gestion du bouton unique après fin de lecture
+// gestion bouton listen 
 let showListenButton = false;
 let listenButtonX;
 let listenButtonY;
 let listenButtonSize = 60;
 let playingSequence = false; // interdit multiple déclenchements de la séquence
-// bouton supplémentaire "start" affiché à droite de listen
+
+// bouton start
 let startButtonX;
 let startButtonY;
 let startButtonW;
 let startButtonH;
 let startLabel = "start";
 
-// bouton terminer et positions pour détection
+// bouton terminer et positions 
 let terminatorX;
 let terminatorY;
 
@@ -62,6 +63,7 @@ function setup() {
   serial.list(); // list the serial ports
   serial.open(portName); // open a serial port
 
+  //création des 12 oscillateurs pour chaque note
   for(let i = 0; i < frequencies.length; i++){
     let osc = new p5.Oscillator();
     osc.setType('triangle'); // son plus "instrumental"
@@ -89,7 +91,7 @@ function portOpen() {
 }
 
 function serialEvent() {
-  // Si on n'est pas en mode lecture, s'assurer que tout est coupé et ignorer l'input
+  // Si on n'est pas en mode lecture
   if (!isPlaying) {
     for (let i = 0; i < oscillators.length; i++) {
       oscillators[i].amp(0); // arrêt immédiat
@@ -104,9 +106,10 @@ function serialEvent() {
             let touchIndex = parseInt(parts[0]);
             let state = parseInt(parts[1]);
 
+            //Vérifie sur l'index existe
             if(touchIndex >= 0 && touchIndex < oscillators.length){
 
-                // 🎵 GESTION DU SON (uniquement si isPlaying est true grâce au guard ci-dessus)
+                // Si état 1 et pas première note silencieuse
                 if(state === 1){
                     if(touchIndex !== 0) { // première note est un silence
                         oscillators[touchIndex].amp(0.5, 0.05); // fade in
@@ -117,7 +120,7 @@ function serialEvent() {
                     }
                 }
 
-                // 🎨 GESTION DES RONDS - n'ajouter un cercle que si isPlaying est true
+                // ajouter une note sur la partition
                 if(state === 1){
                     let radius = circleDiameter / 2;
                     if(nextX + radius <= blockX + blockWidth){
@@ -129,9 +132,9 @@ function serialEvent() {
                             isRest: touchIndex === 0
                         });
 
-                        nextX += xStep;
+                        nextX += xStep; //décale la position X pour la prochaine note
 
-                        // si on vient de dépasser la fin du bloc => arrêter tout de suite
+                        // si on vient de dépasser la fin du bloc => arrêt 
                         if(nextX + radius > blockX + blockWidth){
                             isPlaying = false;
                             showListenButton = true;
@@ -144,31 +147,6 @@ function serialEvent() {
             }
         }
     }
-    // let data = serial.readLine();
-    // if (data && data.length > 0) {
-    //     let parts = data.trim().split(",");
-    //     if (parts.length === 2) {
-    //         let touchIndex = parseInt(parts[0]);
-    //         let state = parseInt(parts[1]);
-
-    //         if(touchIndex >= 0 && touchIndex < notePositions.length){
-    //             if(state === 1){ // touche pressée
-    //                 // Vérifier que nextX ne dépasse pas la limite du bloc
-    //                 let radius = circleDiameter / 2;
-    //                 if(nextX + radius <= blockX + blockWidth){ // radius calculé depuis circleDiameter
-    //                     circles.push({
-    //                         x: nextX,
-    //                         y: notePositions[touchIndex],
-    //                         color: [0,0,0],
-    //                         index: touchIndex
-    //                     });
-    //                     console.log("Added circle for touch index:", touchIndex, "at position Y:", notePositions[touchIndex]);
-    //                     nextX += xStep;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 
@@ -183,10 +161,10 @@ function portClose() {
 function drawCircle(index){
     if(index < 0 || index >= notePositions.length){
         console.warn("Index hors limites :", index);
-        return; // ne fait rien
+        return; 
     }
     let y = notePositions[index];
-    let x = 200;
+    //let x = 200;
     fill(0,255,0);
     noStroke();
     ellipse(x, y, circleDiameter);
