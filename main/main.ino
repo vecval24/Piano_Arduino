@@ -23,10 +23,12 @@ void setup() {
     while (1) {} // boucle infinie si capteur non détecté
   }
 
+
   Serial.println("MPR121 found!");
   Serial.println("Running auto configuration.");
   cap.setAutoconfig(true);
   Serial.println("Initialization complete.");
+
 }
 
 void loop() {
@@ -35,7 +37,7 @@ void loop() {
   for (uint8_t i = 0; i < 12; i++) {
     // Nouvelle touche pressée
     if ((currtouched & _BV(i)) && !(lasttouched & _BV(i))) { //touchée mtn mais pas avant
-     //Serial.print("Touche "); //Interfère avec le indextouch envoyé à la console
+     //Serial.print("Touche ");
       Serial.print(i);
       Serial.println(",1");
       //Serial.println(" touchée");

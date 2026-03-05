@@ -7,7 +7,7 @@ Option Arduino 2026 – COMEM+
 
 ## Description du projet
 
-Ce projet consiste à réaliser un piano d’une octave interactif à l’aide d’une carte Arduino et d’un capteur tactile capacitif Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout.
+Ce projet consiste à réaliser un piano interactif à l’aide d’une carte Arduino et d’un capteur tactile capacitif Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout.
 
 Les touches du piano sont les bouts des câbées reliés aux 12 entrées du capteur, représentées de manière créative. Lorsqu’une touche est activée par contact, la note correspondante est :
 
@@ -21,10 +21,10 @@ Les touches du piano sont les bouts des câbées reliés aux 12 entrées du capt
 ## Fonctionnement
 1 - Détection des touches
 
-    Le module MPR121 permet de détecter jusqu’à 12 entrées tactiles capacitives.
-    Dans ce projet, les 12 entrées sont utilisées pour représenter les notes du piano dont une une blanche (silence) pour y ajouter plus de modalités au niveau sonore. 
+Le module MPR121 permet de détecter jusqu’à 12 entrées tactiles capacitives.
+Dans ce projet, les 12 entrées sont utilisées pour représenter les notes du piano dont une une blanche (silence) pour y ajouter plus de modalités au niveau sonore. 
 
-    Lorsqu’un doigt entre en contact avec la surface d'un câble :
+Lorsqu’un doigt entre en contact avec la surface d'un câble :
 
     Le changement d'état est détecté (0 ou 1)
 
@@ -47,11 +47,11 @@ Un programme côté ordinateur :
 
 3 - Enregistrement et génération de partition
 
-    Chaque note jouée est stockée dans une structure de données.
+Chaque note jouée est stockée dans une structure de données.
 
-    À partir de ces informations, une partition numérique est générée automatiquement.
+À partir de ces informations, une partition numérique est générée automatiquement.
 
-    Cette partition peut être visualisée et réécoutée jusqu'à ce que l'on recommence une nouvelle mélodie. (choix via des boutons sur l'interface)
+Cette partition peut être visualisée et réécoutée jusqu'à ce que l'on recommence une nouvelle mélodie. (choix via des boutons sur l'interface)
 
 
 ## Matériel utilisé
