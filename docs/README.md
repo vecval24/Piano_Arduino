@@ -2,17 +2,18 @@
 
 ## Recherche et conception
 
-`Quelques notes sur la conception, des projets de référence, mon intention, etc.`
+L'idée du piano m'est venue en m'inspirant de projets réalisés avec Arduino. Je suis tombée sur un projet qui s'intitule [Blossom](https://shakethatbutton.com/blossom/) et qui est une histoire interactive avec des touches de piano directement dans le livre. Mon but étant de reprendre l'idée des touches de piano et de les afficher sur une interface et de pouvoir improviser des mélodies tout en les rééecoutant par la suite. Le choix du capteur s'est porté sur Adafruit, qui contient 12 entrées, relié au microcontrôleur Arduino.
 
-![Description de l'image](/docs/assets/croquis-de-recherche.png)
+
+![Piano Arduino et l'interface sur ordinateur](/docs/assets/Piano_Interface.jpg)
 
 ## Circuit électronique
 
-Le circuit électronique du projet repose sur une communication entre la carte microcontrôleur Arduino et un module de détection tactile capacitif Adafruit. L’ensemble est monté sur une breadboard, liés avec des câbles. Huit entrées sont utilisées pour relier aux notes de l'octave du piano.
+Le circuit électronique du projet repose sur une communication entre la carte microcontrôleur Arduino et un module de détection tactile capacitif Adafruit. L’ensemble est monté sur une breadboard, liés avec des câbles. Douze entrées sont utilisées pour relier aux notes d'un piano.
 
 ### Schéma
 
-Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout, avec les connexions d’alimentation et I2C, et un câble connecté à une touche de piano capacitive (une des 8 notes de l’octave).
+Schéma de câblage montre un Arduino Uno relié sur breadboard à un Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout, avec les connexions d’alimentation (VIN et GND) et I2C (SCL et SDA), et un câble connecté à une touche de piano capacitive (une des 12 notes de piano).
 ![Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout, avec les connexions d’alimentation et I2C, et un câble connecté à une touche de piano capacitive (une des 12 notes).](/docs/assets/Fritzing.png)
 
 ### BOM
@@ -35,8 +36,33 @@ Schéma de câblage montrant un Arduino Uno relié sur breadboard à un Adafruit
 
 ## Programme
 
-`Quelques notes sur des le code, des particularités, sa structure, l'usage de libs particulières, etc.`
+Dans le fichier html, voici les librairies chargées : 
+- p5.js (v1.4.0) : framework graphique/animation
+- p5.serialport.js : communication USB série entre Arduino et navigateur
+- p5.sound.js (v1.9.0) : synthèse audio (oscillateurs)
+
+Dans le fichier sketch.js, voici les données clés utilisées : 
+- notes : noms des 12 notes (G5 à C4)
+- notePositions : Y des lignes de la partition
+- frequencies : Hz de chaque note
+- oscillators : 12 oscillateurs p5.Oscillator actifs
+- circles : visualisation des notes jouées (avec position X)
+
+**Mode "enregistrement" :**
+
+isPlaying = true
+Reçoit les touches du capteur via série
+Ajoute les cercles sur la partition (X = nextX qui décale les notes)
+Joue le son en temps réel avec les oscillateurs
+Mode "lecture" : bouton Listen et Start
+
+**Particularités :**
+
+userStartAudio() nécessaire pour démarrer Web Audio API (restrictions navigateur)
+
 
 ## Roadmap
 
-`Mention de choses pas tout à fait fonctionnelles ou améliorables. Idées de nouvelles fonctionnalités et liste d'améliorations souhaitables.`
+Pour les choses améliorables, il y aurait la détection des touches afin d'utiliser la peinture conductrice. Les câbles mâles sont actuellement trop sensibles et mal réglés car ils détectent en continu lorsqu'ils sont reliés à la peinture. 
+
+Pour les nouvelles fonctionnalités, la partition pourrait être améliorée avec notamment une diversification des notes de musique (noire, blanche, croche, double croche etc.). Ceci demanderait une notion de temps et de rapidité pour la détection des touches.

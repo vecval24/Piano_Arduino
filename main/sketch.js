@@ -158,19 +158,6 @@ function portClose() {
   console.log("The serial port is closed.");
 }
 
-function drawCircle(index){
-    if(index < 0 || index >= notePositions.length){
-        console.warn("Index hors limites :", index);
-        return; 
-    }
-    let y = notePositions[index];
-    //let x = 200;
-    fill(0,255,0);
-    noStroke();
-    ellipse(x, y, circleDiameter);
-    console.log("Drew circle at index:", index, "Position Y:", y);
-}
-
 function mousePressed() {
 
   // si on affiche le bouton unique "listen", gérer indépendemment
