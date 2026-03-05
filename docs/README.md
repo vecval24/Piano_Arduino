@@ -11,7 +11,7 @@ L'idée du piano m'est venue en m'inspirant de projets réalisés avec Arduino. 
 
 Le circuit électronique du projet repose sur une communication entre la carte microcontrôleur Arduino et un module de détection tactile capacitif Adafruit. L’ensemble est monté sur une breadboard, liés avec des câbles. Douze entrées sont utilisées pour relier aux notes d'un piano.
 
-![Circuit électronique](/docs/assets/Câblage.jpg)
+[Circuit électronique](/docs/assets/Câblage.jpg)
 
 ### Schéma
 
