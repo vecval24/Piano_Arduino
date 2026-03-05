@@ -76,4 +76,4 @@ Pour les choses améliorables, il y aurait la détection des touches afin d'util
 Pour les nouvelles fonctionnalités, la partition pourrait être améliorée avec notamment une diversification des notes de musique (noire, blanche, croche, double croche etc.). Ceci demanderait une notion de temps et de rapidité pour la détection des touches. Cela augmenterait la difficulté du code mais également une diversification des mélodies.
 
 ## Démo vidéo
-![Piano Arduino démonstration vidéo](/docs/assets/Démo_vidéo.MOV)
+[Démonstration en vidéo du Piano Arduino](https://youtu.be/erGqB10TYXs)

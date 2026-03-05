@@ -9,7 +9,7 @@ Option Arduino 2026 – COMEM+
 
 Ce projet consiste à réaliser un piano interactif à l’aide d’une carte Arduino et d’un capteur tactile capacitif Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout.
 
-![Piano Arduino et l'interface sur ordinateur](/docs/assets/Piano_Arduino_Interface.jpg)
+[Piano Arduino et l'interface](docs/assets/Piano_Arduino_Interface.jpg)
 
 Les touches du piano sont les bouts des câbées reliés aux 12 entrées du capteur, représentées de manière créative. Lorsqu’une touche est activée par contact, la note correspondante est :
 
