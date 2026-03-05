@@ -9,6 +9,8 @@ Option Arduino 2026 – COMEM+
 
 Ce projet consiste à réaliser un piano interactif à l’aide d’une carte Arduino et d’un capteur tactile capacitif Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout.
 
+![Piano Arduino et l'interface sur ordinateur](/docs/assets/Piano_Arduino_Interface.jpg)
+
 Les touches du piano sont les bouts des câbées reliés aux 12 entrées du capteur, représentées de manière créative. Lorsqu’une touche est activée par contact, la note correspondante est :
 
 - Jouée sur l’ordinateur en temps réel
@@ -26,11 +28,11 @@ Dans ce projet, les 12 entrées sont utilisées pour représenter les notes du p
 
 Lorsqu’un doigt entre en contact avec la surface d'un câble :
 
-    Le changement d'état est détecté (0 ou 1)
+- Le changement d'état est détecté (0 ou 1)
 
-    L’information est envoyée à l’Arduino 
+- L’information est envoyée à l’Arduino 
 
-    L’Arduino transmet la note correspondante à l’ordinateur
+- L’Arduino transmet la note correspondante à l’ordinateur
 
 
 2 - Génération du son
@@ -56,15 +58,15 @@ Cette partition peut être visualisée et réécoutée jusqu'à ce que l'on reco
 
 ## Matériel utilisé
 
-Carte Arduino Uno R3
+- Carte Arduino Uno R3
 
-Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout
+- Adafruit MPR121 12-Key Capacitive Touch Sensor Breakout
 
-Carton pour la structure
+- Carton pour la structure
 
-Câblage
+- Câblage
 
-Ordinateur (pour génération du son et partition)`
+- Ordinateur (pour génération du son et partition)`
 
 ## Documentation
 

@@ -5,11 +5,13 @@
 L'idée du piano m'est venue en m'inspirant de projets réalisés avec Arduino. Je suis tombée sur un projet qui s'intitule [Blossom](https://shakethatbutton.com/blossom/) et qui est une histoire interactive avec des touches de piano directement dans le livre. Mon but étant de reprendre l'idée des touches de piano et de les afficher sur une interface et de pouvoir improviser des mélodies tout en les rééecoutant par la suite. Le choix du capteur s'est porté sur Adafruit, qui contient 12 entrées, relié au microcontrôleur Arduino.
 
 
-![Piano Arduino et l'interface sur ordinateur](/docs/assets/Piano_Interface.jpg)
+![Piano Arduino et l'interface sur ordinateur](/docs/assets/Piano_Arduino_Interface.jpg)
 
 ## Circuit électronique
 
 Le circuit électronique du projet repose sur une communication entre la carte microcontrôleur Arduino et un module de détection tactile capacitif Adafruit. L’ensemble est monté sur une breadboard, liés avec des câbles. Douze entrées sont utilisées pour relier aux notes d'un piano.
+
+![Circuit électronique](/docs/assets/Câblage.jpg)
 
 ### Schéma
 
@@ -72,3 +74,6 @@ userStartAudio() nécessaire pour démarrer Web Audio API (restrictions navigate
 Pour les choses améliorables, il y aurait la détection des touches afin d'utiliser la peinture conductrice. Les câbles mâles sont actuellement trop sensibles et mal réglés car ils détectent en continu lorsqu'ils sont reliés à la peinture. 
 
 Pour les nouvelles fonctionnalités, la partition pourrait être améliorée avec notamment une diversification des notes de musique (noire, blanche, croche, double croche etc.). Ceci demanderait une notion de temps et de rapidité pour la détection des touches. Cela augmenterait la difficulté du code mais également une diversification des mélodies.
+
+## Démo vidéo
+![Piano Arduino démonstration vidéo](/docs/assets/Démo_vidéo.MOV)
